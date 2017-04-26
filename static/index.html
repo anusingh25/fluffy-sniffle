@@ -1,0 +1,36 @@
+<html>
+  <form action="/api/state" method="post">
+    <label for="light_switch">Lights on</label>
+    <input id="light_switch" type="checkbox" onchange="send_light_switch_state(this)">
+  </form>
+  <script>
+    function update_light_switch_state() {
+      var http = new XMLHttpRequest();
+      http.open("GET", "/api/state", true);
+      http.onreadystatechange = function() {
+        if(http.readyState == 4 && http.status == 200) {
+          var data = JSON.parse(http.responseText);
+          document.getElementById("light_switch").checked = data.light_state;
+          document.getElementById("light_switch").disabled = false;
+        }
+      }
+      http.send();
+    }
+
+    function send_light_switch_state(element) {
+      var http = new XMLHttpRequest();
+      var params = "light_state="+ element.checked;
+      http.open("POST", "/api/state", true);
+      http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      http.onreadystatechange = function() {
+        if(http.readyState == 4 && http.status == 200) {
+          //update_light_switch_state()
+          element.disabled = true;
+        }
+      }
+      http.send(params);
+    }
+
+    var t = setInterval(update_light_switch_state, 1000);
+  </script>
+</html>
